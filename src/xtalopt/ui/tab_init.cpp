@@ -19,6 +19,7 @@
 #include <xtalopt/xtalopt.h>
 
 #include <QSettings>
+#include <QMutexLocker>
 
 #include "dialog.h"
 
@@ -33,6 +34,7 @@ namespace XtalOpt {
     ui.setupUi(m_tab_widget);
 
     m_dialog = parent;
+    m_compTableMutex = new QMutex;
 
     // dialog connections
     connect(m_dialog, SIGNAL(tabsReadSettings(const QString &)),
@@ -51,6 +53,8 @@ namespace XtalOpt {
             this, SLOT(getComposition(QString)));
     connect(ui.edit_composition, SIGNAL(editingFinished()),
             this, SLOT(updateComposition()));
+    connect(ui.table_composition, SIGNAL(itemChanged(QTableWidgetItem*)),
+            this, SLOT(cleanUpCompositionTable()));
 
     // unit cell dimension connections
     connect(ui.spin_a_min, SIGNAL(editingFinished()),
@@ -89,11 +93,14 @@ namespace XtalOpt {
             this, SLOT(updateDimensions()));
     connect(ui.cb_shortestInteratomicDistance, SIGNAL(toggled(bool)),
             this, SLOT(updateDimensions()));
+
+    cleanUpCompositionTable();
+
   }
 
   TabInit::~TabInit()
   {
-    //qDebug() << "TabInit::~TabInit() called";
+    delete m_compTableMutex;
   }
 
   void TabInit::writeSettings(const QString &filename) {
@@ -217,7 +224,6 @@ namespace XtalOpt {
   }
 
   void TabInit::getComposition(const QString &str) {
-    //qDebug() << "TabInit::getComposition( " << str << ") called";
     QHash<uint, uint> comp;
     QString symbol;
     uint atomicNum;
@@ -234,7 +240,7 @@ namespace XtalOpt {
     uint length = (symbolList.size() < quantityList.size()) ? symbolList.size() : quantityList.size();
 
     if ( length == 0 ) {
-      ui.list_composition->clear();
+      clearCompositionTable();
       m_opt->comp.clear();
       return;
     }
@@ -267,15 +273,16 @@ namespace XtalOpt {
     }
 
     // Dump hash into list
-    ui.list_composition->clear();
+    clearCompositionTable();
     QList<uint> keys = comp.keys();
     qSort(keys);
-    QString line ("%1=%2 x %3");
     for (int i = 0; i < keys.size(); i++) {
       atomicNum = keys.at(i);
       quantity  = comp[atomicNum];
       symbol	= OpenBabel::etab.GetSymbol(atomicNum);
-      new QListWidgetItem(line.arg(atomicNum,3).arg(symbol,2).arg(quantity), ui.list_composition);
+      for (int j = 0; j < quantity; j++) {
+        addRowToCompositionTable(symbol);
+      }
     }
 
     // Save hash
@@ -336,6 +343,101 @@ namespace XtalOpt {
     m_opt->using_shortestInteratomicDistance       = ui.cb_shortestInteratomicDistance->isChecked();
     m_opt->shortestInteratomicDistance		= ui.spin_shortestInteratomicDistance->value();
   }
+
+  void TabInit::clearCompositionTable()
+  {
+    ui.table_composition->blockSignals(true);
+
+    QMutexLocker locker (m_compTableMutex);
+    while (ui.table_composition->rowCount() != 0) {
+      ui.table_composition->removeRow(0);
+    }
+
+    ui.table_composition->blockSignals(false);
+    locker.unlock();
+    cleanUpCompositionTable();
+  }
+
+  void TabInit::addRowToCompositionTable(const QString & atom,
+                                         bool constrain,
+                                         double x,
+                                         double y,
+                                         double z)
+  {
+    QMutexLocker locker (m_compTableMutex);
+
+    ui.table_composition->blockSignals(true);
+
+    // Add row to end of table
+    int row = ui.table_composition->rowCount();
+    ui.table_composition->insertRow(row);
+
+    // Fill columns
+    //  Atomic symbol
+    QTableWidgetItem *item;
+    item = new QTableWidgetItem(atom);
+    item->setFlags(Qt::ItemIsEnabled);
+    ui.table_composition->setItem(row, CC_AtomicSymbol, item);
+
+    //  Constraint checkbox
+    item = new QTableWidgetItem(tr("Contrain?"));
+    item->setCheckState(Qt::Unchecked);
+    ui.table_composition->setItem(row, CC_Constrain, item);
+
+    //  Fractional x coordinate
+    item = new QTableWidgetItem(QString::number(x));
+    ui.table_composition->setItem(row, CC_X, item);
+
+    //  Fractional y coordinate
+    item = new QTableWidgetItem(QString::number(y));
+    ui.table_composition->setItem(row, CC_Y, item);
+
+    //  Fractional z coordinate
+    item = new QTableWidgetItem(QString::number(z));
+    ui.table_composition->setItem(row, CC_Z, item);
+
+    ui.table_composition->blockSignals(false);
+    locker.unlock();
+    cleanUpCompositionTable();
+  }
+
+  void TabInit::cleanUpCompositionTable()
+  {
+    QMutexLocker locker (m_compTableMutex);
+
+    ui.table_composition->blockSignals(true);
+
+    QTableWidgetItem *item;
+    // Work on rows
+    for (int row = 0;
+         row < ui.table_composition->rowCount();
+         row++) {
+      // Is the atom constrained?
+      if (ui.table_composition->item(row, CC_Constrain)->checkState() == Qt::Checked) {
+        for (int column = CC_X; column <= CC_Z; column++) {
+          item = ui.table_composition->item(row, column);
+          item->setFlags(Qt::ItemIsEditable | Qt::ItemIsEnabled);
+        }
+      }
+      // Atom is not constrained
+      else {
+        for (int column = CC_X; column <= CC_Z; column++) {
+          item = ui.table_composition->item(row, column);
+          item->setFlags(0);
+          item->setText(tr("N/A"));
+        }
+      }
+    }
+
+    for (int column = 0;
+         column < ui.table_composition->columnCount();
+         column++) {
+      ui.table_composition->resizeColumnToContents(column);
+    }
+
+    ui.table_composition->blockSignals(false);
+  }
+
 }
 
 //#include "tab_init.moc"

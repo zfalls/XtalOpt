@@ -23,9 +23,6 @@
       <string>Composition</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
-      <item row="1" column="1" colspan="4">
-       <widget class="QListWidget" name="list_composition"/>
-      </item>
       <item row="0" column="2" colspan="3">
        <widget class="QLineEdit" name="edit_composition"/>
       </item>
@@ -43,6 +40,44 @@
         <property name="buddy">
          <cstring>edit_composition</cstring>
         </property>
+       </widget>
+      </item>
+      <item row="1" column="1" colspan="4">
+       <widget class="QTableWidget" name="table_composition">
+        <property name="horizontalScrollBarPolicy">
+         <enum>Qt::ScrollBarAsNeeded</enum>
+        </property>
+        <attribute name="horizontalHeaderCascadingSectionResizes">
+         <bool>false</bool>
+        </attribute>
+        <attribute name="horizontalHeaderCascadingSectionResizes">
+         <bool>false</bool>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>Atom</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Constrain</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>x (frac)</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>y (frac)</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>z (frac)</string>
+         </property>
+        </column>
        </widget>
       </item>
      </layout>
@@ -460,7 +495,7 @@ p, li { white-space: pre-wrap; }
  </widget>
  <tabstops>
   <tabstop>edit_composition</tabstop>
-  <tabstop>list_composition</tabstop>
+  <tabstop>table_composition</tabstop>
   <tabstop>spin_a_min</tabstop>
   <tabstop>spin_a_max</tabstop>
   <tabstop>spin_b_min</tabstop>

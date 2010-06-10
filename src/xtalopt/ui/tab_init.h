@@ -22,6 +22,8 @@
 
 #include "ui_tab_init.h"
 
+class QMutex;
+
 namespace XtalOpt {
   class XtalOptDialog;
   class XtalOpt;
@@ -36,6 +38,14 @@ namespace XtalOpt {
 
     QWidget *getTabWidget() {return m_tab_widget;};
 
+    enum CompositionColumns {
+      CC_AtomicSymbol = 0,
+      CC_Constrain,
+      CC_X,
+      CC_Y,
+      CC_Z
+    };
+
   public slots:
     // used to lock bits of the GUI that shouldn't be change when a
     // session starts. This will also pass the call on to all tabs.
@@ -47,10 +57,15 @@ namespace XtalOpt {
     void getComposition(const QString & str);
     void updateComposition();
     void updateDimensions();
+    void clearCompositionTable();
+    void cleanUpCompositionTable();
+    void addRowToCompositionTable(const QString & atom, bool constrain = false, double x = 0.0, double y = 0.0, double z = 0.0);
 
   signals:
 
   private:
+    QMutex *m_compTableMutex;
+
     Ui::Tab_Init ui;
     QWidget *m_tab_widget;
     XtalOptDialog *m_dialog;
