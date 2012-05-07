@@ -54,7 +54,9 @@ if(ENABLE_SSH)
       "libssh too old! Installed version is ${LibSSH_VERSION}, need at least "
       "libssh ${LibSSH_MIN_VERSION}")
     endif()
-    include_directories(${LIBSS_INCLUDE_DIRS})
+    message(STATUS "LibSSH found: ${LibSSH_VERSION} ${LIBSSH_INCLUDE_DIRS} ${LIBSSH_LIBRARIES}")
+    include_directories(${LIBSSH_INCLUDE_DIRS})
+    add_definitions(-DLIBSSH_STATIC)
   endif(USE_CLI_SSH)
 endif()
 
