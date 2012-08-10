@@ -277,9 +277,16 @@ void MolecularXtalSuperCellGeneratorPrivate::assignMovers()
     QVector<double> energyList;
     energyToSubMolLUT.reserve(stoich);
     energyList.reserve(stoich);
+    int subMolInd = -1;
     for (int i = 0; i < stoich; ++i) {
-      energyToSubMolLUT.push_back(i);
-      energyList.push_back(this->energies.at(i));
+      // Find the index of the next submolecule with the current source id
+      while (this->parentMXtal.subMolecule(++subMolInd)->sourceId()
+             != sourceId) {}
+      Q_ASSERT_X(subMolInd < this->parentMXtal.numSubMolecules(), Q_FUNC_INFO,
+                 "The submolecule index counter has exceed the number of "
+                 "available submolecules!");
+      energyToSubMolLUT.push_back(subMolInd);
+      energyList.push_back(this->energies.at(subMolInd));
     }
 
     // Select references for this source id
