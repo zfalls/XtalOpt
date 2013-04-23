@@ -67,13 +67,23 @@ namespace GlobalSearch {
   bool SSHConnectionCLI::copyDirectoryToServer(const QString &localpath,
                                                const QString &remotepath)
   {
-    return this->executeSCPTo(localpath, remotepath, QStringList("-r"));
+    QStringList args ("-p ");
+    args << remotepath;
+    this->executeSSH("mkdir", args);
+    QString arg1;
+    arg1 = remotepath + "/.." ;
+    return this->executeSCPTo(localpath, arg1, QStringList("-r"));
   }
 
   bool SSHConnectionCLI::copyDirectoryFromServer(const QString &remotepath,
                                                  const QString &localpath)
   {
-    return this->executeSCPFrom(remotepath, localpath, QStringList("-r"));
+    QStringList args ("-p ");
+    args << localpath;
+    this->executeSSH("mkdir", args);
+    QString arg1;
+    arg1 = localpath + "/.." ;
+    return this->executeSCPFrom(remotepath, arg1, QStringList("-r"));
   }
 
   bool SSHConnectionCLI::readRemoteDirectoryContents(const QString &remotepath,
