@@ -26,7 +26,7 @@ int mat_get_trace_i3( SPGCONST int a[3][3] )
   return a[0][0] + a[1][1] + a[2][2];
 }
 
-void mat_copy_matrix_d3(double a[3][3], SPGCONST double (*b)[3])
+void mat_copy_matrix_d3(double a[3][3], SPGCONST double b[3][3])
 {
   a[0][0] = b[0][0];
   a[0][1] = b[0][1];
@@ -88,6 +88,26 @@ int mat_check_identity_matrix_i3(SPGCONST int a[3][3],
 int mat_check_identity_matrix_d3( SPGCONST double a[3][3],
 				  SPGCONST double b[3][3],
 				  const double symprec )
+{
+  if ( mat_Dabs( a[0][0] - b[0][0] ) > symprec ||
+       mat_Dabs( a[0][1] - b[0][1] ) > symprec ||
+       mat_Dabs( a[0][2] - b[0][2] ) > symprec ||
+       mat_Dabs( a[1][0] - b[1][0] ) > symprec ||
+       mat_Dabs( a[1][1] - b[1][1] ) > symprec ||
+       mat_Dabs( a[1][2] - b[1][2] ) > symprec ||
+       mat_Dabs( a[2][0] - b[2][0] ) > symprec ||
+       mat_Dabs( a[2][1] - b[2][1] ) > symprec ||
+       mat_Dabs( a[2][2] - b[2][2] ) > symprec ) {
+    return 0;
+  }
+  else {
+    return 1;
+  }
+}
+
+int mat_check_identity_matrix_id3( SPGCONST int a[3][3],
+				   SPGCONST double b[3][3],
+				   const double symprec )
 {
   if ( mat_Dabs( a[0][0] - b[0][0] ) > symprec ||
        mat_Dabs( a[0][1] - b[0][1] ) > symprec ||
