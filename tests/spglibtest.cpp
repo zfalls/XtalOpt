@@ -232,7 +232,8 @@ Direct\n\
 
   xtal = XtalOpt::Xtal::POSCARToXtal(poscar);
   xtal->findSpaceGroup(FROMPIO_TOL);
-  QEXPECT_FAIL("", "spglib: P1, findsym: Pc", Continue);
+  // This started passing when I bumped spglib to v1.4.1
+//  QEXPECT_FAIL("", "spglib: P1, findsym: Pc", Continue);
   QCOMPARE(xtal->getSpaceGroupSymbol(), QString("Pc"));
   delete xtal;
 }

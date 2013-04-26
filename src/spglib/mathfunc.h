@@ -28,6 +28,9 @@ int mat_check_identity_matrix_i3(SPGCONST int a[3][3],
 int mat_check_identity_matrix_d3( SPGCONST double a[3][3],
 				  SPGCONST double b[3][3],
 				  const double symprec );
+int mat_check_identity_matrix_id3( SPGCONST int a[3][3],
+				   SPGCONST double b[3][3],
+				   const double symprec );
 void mat_multiply_matrix_d3(double m[3][3],
 			    SPGCONST double a[3][3],
 			    SPGCONST double b[3][3]);
