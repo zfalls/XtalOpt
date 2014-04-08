@@ -1,0 +1,3 @@
+/home/z/lib/avogadro/1_1/contrib/xtalopt.so
+/home/z/lib/avogadro/1_1/contrib/randomdock.so
+/home/z/lib/avogadro/1_1/contrib/gapc.so
