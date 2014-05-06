@@ -772,25 +772,30 @@ namespace XtalOpt {
 
             // Compute a cut off distance -- atoms farther away than this value
             // will abort the check early.
-            double maxCheckDistance = 0.0;
-            for (QHash<unsigned int, XtalCompositionStruct>::const_iterator
+           // double maxCheckDistance = 0.0;
+       /*     for (QHash<unsigned int, XtalCompositionStruct>::const_iterator
                 it = limits.constBegin(), it_end = limits.constEnd(); it != it_end;
                 ++it) {
                 for (QHash<unsigned int, XtalCompositionStruct>::const_iterator
                     it2 = limits.constBegin(), it2_end = limits.constEnd(); it2 != it2_end;
                     ++it2) {
                     
-                    double minRadiusMax = it.value().minRadius + it2.value().minRadius;
+                    double minRadiusMax = OpenBabel::etab.GetCovalentRad(it.key()) + OpenBabel::etab.GetCovalentRad(it2.key());
                     if (minRadiusMax > maxCheckDistance) {
-                        maxCheckDistance = it.value().minRadius + it2.value().minRadius;
+                        maxCheckDistance = OpenBabel::etab.GetCovalentRad(it.key()) + OpenBabel::etab.GetCovalentRad(it2.key());
                     }
 
-                    if (limitsIAD.value(qMakePair<int, int>(it.key(), it2.key())).minIAD > maxCheckDistance) {
-                        maxCheckDistance = limitsIAD.value(qMakePair<int, int>(it.key(), it2.key())).minIAD;
-                    }
+                   // if (limitsIAD.value(qMakePair<int, int>(it.key(), it2.key())).minIAD < maxCheckDistance) {
+                        maxCheckDistance = 1.5*(limitsIAD.value(qMakePair<int, int>(it.key(), it2.key())).minIAD);
+                   // }
+ 
+                   // if (limitsIAD.value(qMakePair<int, int>(it.key(), it2.key())).minIAD > maxCheckDistance) {
+                   //     maxCheckDistance = (limitsIAD.value(qMakePair<int, int>(it.key(), it2.key())).minIAD);
+                   // }
+                   
                 }
-            }
-            const double maxCheckDistSquared = maxCheckDistance*maxCheckDistance;
+            }*/
+          //  const double maxDistSquared = maxCheckDistance*maxCheckDistance;
 
             do {
                 // Reset sentinal
@@ -811,11 +816,6 @@ namespace XtalOpt {
                 for (int dist_ind = 0; dist_ind < squaredDists.size(); ++dist_ind) {
                     const double &curDistSquared = squaredDists[dist_ind];
                     // Save a bit of time if distance is huge...
-                    if (curDistSquared > maxCheckDistSquared) {
-                            //qDebug() <<"XtalOpt::addAtomRandomlyIAD: Failed to add atoms with " 
-                              //  "specified interatomic distance. Distance too large";
-                            continue;
-                    }
                     // Compare distance to minimum:
                     for (QHash<unsigned int, XtalCompositionStruct>::const_iterator
                         it = limits.constBegin(), it_end = limits.constEnd(); it != it_end;
@@ -823,9 +823,21 @@ namespace XtalOpt {
                         const double minDist = limitsIAD.value(qMakePair<int, int>(atomicNumber, it.key())).minIAD;
                         const double minDistSquared = minDist * minDist;
 
+                        const double maxDist = 2+(limitsIAD.value(qMakePair<int, int>(atomicNumber, it.key())).minIAD);
+                        const double maxDistSquared = maxDist*maxDist;
+                        
+                        if (curDistSquared < 9.0) {
+                            if (curDistSquared > maxDistSquared) {
+                                qDebug() <<"XtalOpt::addAtomRandomlyIAD: Failed to add atoms with " 
+                                      "specified interatomic distance. Distance too large";
+                                success = false;
+                                break;
+                            }
+                        }
+
                         if (curDistSquared < minDistSquared) {
-                            //debug("XtalOpt::addAtomRandomlyIAD: Failed to add atoms with " 
-                              //  "specified interatomic distance. Distance too small");
+                            qDebug() <<"XtalOpt::addAtomRandomlyIAD: Failed to add atoms with " 
+                                "specified interatomic distance. Distance too small";
                             success = false;
                             break;
                         }

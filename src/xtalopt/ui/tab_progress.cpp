@@ -332,17 +332,19 @@ namespace XtalOpt {
       xtalLocker.relock();
       switch (state) {
       case QueueInterface::Running:
-        e.status = tr("Running (Opt Step %1 of %2, %3 failures)")
+        e.status = tr("Running (Opt Step %1 of %2, %3 failures, %4 fixes)")
           .arg(QString::number(xtal->getCurrentOptStep()))
           .arg(QString::number(totalOptSteps))
-          .arg(QString::number(xtal->getFailCount()));
+          .arg(QString::number(xtal->getFailCount()))
+          .arg(QString::number(xtal->getFixCount()));
         e.brush.setColor(Qt::green);
         break;
       case QueueInterface::Queued:
-        e.status = tr("Queued (Opt Step %1 of %2, %3 failures)")
+        e.status = tr("Queued (Opt Step %1 of %2, %3 failures, %4 fixes)")
           .arg(QString::number(xtal->getCurrentOptStep()))
           .arg(QString::number(totalOptSteps))
-          .arg(QString::number(xtal->getFailCount()));
+          .arg(QString::number(xtal->getFailCount()))
+          .arg(QString::number(xtal->getFixCount()));
         e.brush.setColor(Qt::cyan);
         break;
       case QueueInterface::Success:
@@ -415,7 +417,7 @@ namespace XtalOpt {
       break;
     // ZF
     case Xtal::InteratomicDist:
-      e.status = tr("Two atoms are too close together after Optimization %1 of %2")
+      e.status = tr("IAD (Opt Step %1 of %2)")
         .arg(QString::number(xtal->getCurrentOptStep()))
         .arg(QString::number(totalOptSteps));
       e.brush.setColor(Qt::magenta);

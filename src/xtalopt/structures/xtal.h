@@ -73,7 +73,7 @@ namespace XtalOpt {
     bool checkMinIAD(const QHash<QPair<int, int>, IAD> &limits,
                                    int *atom1 = NULL, int *atom2 = NULL,
                                    double *IAD = NULL);
-    bool addAtomRandomlyIAD(unsigned int atomicNumber,
+   bool addAtomRandomlyIAD(unsigned int atomicNumber,
                          const QHash<unsigned int, XtalCompositionStruct> & limits,
                          const QHash<QPair<int, int>, IAD> &limitsIAD,
                          int maxAttempts = 100.0,

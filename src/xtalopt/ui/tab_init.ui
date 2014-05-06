@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>920</width>
+    <width>944</width>
     <height>453</height>
    </rect>
   </property>
@@ -419,7 +419,7 @@ p, li { white-space: pre-wrap; }
         </property>
        </widget>
       </item>
-      <item row="1" column="2" rowspan="8">
+      <item row="1" column="2" rowspan="9">
        <widget class="Line" name="line">
         <property name="orientation">
          <enum>Qt::Vertical</enum>
@@ -494,20 +494,7 @@ able to create offspring that meet this restriction.</string>
         </property>
        </widget>
       </item>
-      <item row="14" column="3">
-       <spacer name="verticalSpacer_2">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
-      </item>
-      <item row="12" column="0" colspan="2">
+      <item row="12" column="0" colspan="3">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
          <widget class="QCheckBox" name="cb_interatomicDistanceLimit">
@@ -550,7 +537,7 @@ able to create offspring that meet this restriction.</string>
         </item>
        </layout>
       </item>
-      <item row="13" column="0" colspan="2">
+      <item row="13" column="0" colspan="3">
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
          <spacer name="horizontalSpacer_2">
@@ -598,29 +585,29 @@ able to create offspring that meet this restriction.</string>
          <double>0.250000000000000</double>
         </property>
        </widget>
-   </item>
-   <item row="14" column="0" colspan="1">
+      </item>
+      <item row="15" column="0" colspan="1">
        <widget class="QCheckBox" name="cb_customIAD">
            <property name="enabled">
            <bool>true</bool>
           </property>
        <property name="text">
-            <string>Use custom interatomic distances?</string>
+            <string>Custom IAD</string>
         </property>
        </widget>
-   </item>
-    <item row="14" column="1" colspan="1">
+      </item>
+      <item row="14" column="0" colspan="1">
        <widget class="QCheckBox" name="cb_checkStepOpt">
            <property name="enabled">
            <bool>true</bool>
           </property>
        <property name="text">
-            <string>Check after each opt. step?</string>
+            <string>Step Check</string>
         </property>
        </widget>
-   </item>
-     <item row="15" column="0" colspan="3">
-        <widget class="QTableWidget" name="table_IAD">
+      </item>
+      <item row="16" column="0" colspan="4">
+       <widget class="QTableWidget" name="table_IAD">
         <property name="sortingEnabled">
          <bool>true</bool>
         </property>
@@ -634,19 +621,19 @@ able to create offspring that meet this restriction.</string>
          <bool>true</bool>
         </attribute>
         <column>
-            <property name="text">
-                <string>Atom 1</string>
-            </property>
+         <property name="text">
+          <string>Atom 1</string>
+         </property>
         </column>
         <column>
-            <property name="text">
-                <string>Atom 2</string>
-            </property>
+         <property name="text">
+          <string>Atom 2</string>
+         </property>
         </column>
         <column>
-            <property name="text">
-                <string>Min. IAD</string>
-            </property>
+         <property name="text">
+          <string>Min. IAD</string>
+         </property>
         </column>
        </widget>
       </item>
@@ -677,7 +664,6 @@ able to create offspring that meet this restriction.</string>
   <tabstop>spin_scaleFactor</tabstop>
   <tabstop>spin_minRadius</tabstop>
   <tabstop>table_comp</tabstop>
-  <tabstop>table_IAD</tabstop>
   <tabstop>cb_customIAD</tabstop>
   <tabstop>cb_checkStepOpt</tabstop>
  </tabstops>

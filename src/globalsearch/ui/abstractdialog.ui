@@ -20,7 +20,7 @@
    <string>Generic Global Search Dialog Window</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="4" column="8">
+   <item row="4" column="9">
     <widget class="QPushButton" name="pushButton">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -33,7 +33,7 @@
      </property>
     </widget>
    </item>
-   <item row="4" column="7">
+   <item row="4" column="8">
     <widget class="QPushButton" name="push_begin">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -87,6 +87,32 @@
     </widget>
    </item>
    <item row="4" column="4">
+    <widget class="QFrame" name="frame">
+     <property name="frameShape">
+      <enum>QFrame::StyledPanel</enum>
+     </property>
+     <property name="frameShadow">
+      <enum>QFrame::Raised</enum>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_4">
+      <item row="0" column="0">
+       <widget class="QLabel" name="label">
+        <property name="text">
+         <string>IAD: </string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLabel" name="label_iad">
+        <property name="text">
+         <string>0</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+  <item row="4" column="5">
     <widget class="QFrame" name="frame_2">
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
@@ -112,7 +138,7 @@
      </layout>
     </widget>
    </item>
-   <item row="4" column="5">
+   <item row="4" column="6">
     <widget class="QFrame" name="frame_4">
      <property name="frameShape">
       <enum>QFrame::StyledPanel</enum>
@@ -151,7 +177,7 @@
      </widget>
     </widget>
    </item>
-   <item row="4" column="6">
+   <item row="4" column="7">
     <spacer name="horizontalSpacer">
      <property name="orientation">
       <enum>Qt::Horizontal</enum>

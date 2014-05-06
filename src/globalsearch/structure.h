@@ -203,6 +203,10 @@ namespace GlobalSearch {
      */
     double getPV()	const {return m_PV;};
 
+    // ZF
+    int getFixCount() const {return m_fixCount;};
+
+
     /** Returns an energetic ranking set by setRank(uint).
      * @return the energetic ranking.
      * @sa setRank
@@ -853,6 +857,10 @@ namespace GlobalSearch {
      */
     void setPV(double pv) {m_PV = pv;};
 
+    // ZF
+    void setFixCount( int fixCount) {m_fixCount = fixCount;};
+
+
     /** Reset the Structure's enthalpy and PV term to zero and clear
      * hasEnthalpy()
      * @sa setEnthalpy
@@ -967,6 +975,15 @@ namespace GlobalSearch {
      */
     void resetFailCount() {setFailCount(0);};
 
+    /** Reset the number of times this Structure has failed the
+     * current optimization step.
+     *
+     * @sa addFailure
+     * @sa setFailCount
+     * @sa getFailCount
+     */
+    void resetFixCount() {setFixCount(0);};
+
     /** Increase the number of times this Structure has failed the
      * current optimization step by one.
      *
@@ -1075,7 +1092,7 @@ namespace GlobalSearch {
     /// \cond
     bool m_hasEnthalpy, m_updatedSinceDupChecked;
     bool m_histogramGenerationPending;
-    uint m_generation, m_id, m_rank, m_jobID, m_currentOptStep, m_failCount;
+    uint m_generation, m_id, m_rank, m_jobID, m_currentOptStep, m_failCount, m_fixCount;
     QString m_parents, m_dupString, m_rempath;
     double m_enthalpy, m_PV;
     State m_status;

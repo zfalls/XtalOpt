@@ -100,7 +100,7 @@ namespace XtalOpt {
 
 signals:
     void deleteJob(int);
-    void updateStatus(int opt, int run, int queue, int fail);
+    void updateStatus(int opt, int iad, int run, int queue, int fail);
     void infoUpdate();
     void updateTableEntry(int row, const XO_Prog_TableEntry& e);
 

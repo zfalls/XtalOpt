@@ -209,6 +209,7 @@ namespace GlobalSearch {
     // Count jobs
     uint running = 0;
     uint optimized = 0;
+    uint iad = 0;
     uint submitted = 0;
     m_tracker->lockForRead();
     QList<Structure*> structures = *m_tracker->list();
@@ -234,9 +235,10 @@ namespace GlobalSearch {
       }
       // Count running jobs and update trackers
       if ( state != Structure::Optimized &&
+           state != Structure::InteratomicDist &&
            state != Structure::Duplicate &&
            state != Structure::Killed &&
-           state != Structure::Removed ) {
+           state != Structure::Removed){
         running++;
         m_runningTracker.lockForWrite();
         m_runningTracker.append(structure);
@@ -246,12 +248,15 @@ namespace GlobalSearch {
         if ( state == Structure::Optimized ) {
           optimized++;
         }
+        else if ( state == Structure::InteratomicDist ) {
+            iad++;
+        }
         m_runningTracker.lockForWrite();
         m_runningTracker.remove(structure);
         m_runningTracker.unlock();
       }
     }
-    emit newStatusOverview(optimized, running, fail);
+    emit newStatusOverview(optimized, iad, running, fail);
 
     // Submit any jobs if needed
     m_jobStartTracker.lockForWrite();
@@ -531,6 +536,7 @@ QString err;
         .arg(s->getIDString())
         .arg(err));
         s->setStatus(Structure::InteratomicDist);
+        locker.unlock();
         emit structureUpdated(s);
         return;
     }
@@ -789,6 +795,7 @@ QString err;
     s->lock()->lockForWrite();
     s->stopOptTimer();
     s->resetFailCount();
+    s->resetFixCount();
     s->setStatus(Structure::Updating);
     s->lock()->unlock();
     if (!m_opt->optimizer()->update(s)) {
