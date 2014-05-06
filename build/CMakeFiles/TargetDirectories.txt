@@ -1,6 +1,0 @@
-/home/z/src/xtalopt-moledit/build/src/xtalcomp/CMakeFiles/XtalComp.dir
-/home/z/src/xtalopt-moledit/build/src/gapc/CMakeFiles/gapc.dir
-/home/z/src/xtalopt-moledit/build/src/globalsearch/CMakeFiles/globalsearch.dir
-/home/z/src/xtalopt-moledit/build/src/randomdock/CMakeFiles/randomdock.dir
-/home/z/src/xtalopt-moledit/build/src/spglib/CMakeFiles/spglib.dir
-/home/z/src/xtalopt-moledit/build/src/xtalopt/CMakeFiles/xtalopt.dir
