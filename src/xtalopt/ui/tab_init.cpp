@@ -23,6 +23,7 @@
 #include <QtGui/QHeaderView>
 #include <QtGui/QTableWidget>
 #include <QtGui/QTableWidgetItem>
+#include <QtGui/QMessageBox>
 
 #include "dialog.h"
 
@@ -78,6 +79,11 @@ namespace XtalOpt {
             this, SLOT(updateDimensions()));
     connect(ui.cb_interatomicDistanceLimit, SIGNAL(toggled(bool)),
             this, SLOT(updateDimensions()));
+    // ZF
+    connect(ui.cb_customIAD, SIGNAL(toggled(bool)),
+            this, SLOT(updateDimensions()));
+    connect(ui.table_IAD, SIGNAL(itemSelectionChanged()),
+            this, SLOT(updateMinIAD()));
 
     QHeaderView *horizontal = ui.table_comp->horizontalHeader();
     horizontal->setResizeMode(QHeaderView::ResizeToContents);
@@ -120,6 +126,11 @@ namespace XtalOpt {
     settings->setValue("using/fixedVolume",   xtalopt->using_fixed_volume);
     settings->setValue("using/interatomicDistanceLimit",
                        xtalopt->using_interatomicDistanceLimit);
+    // ZF
+    settings->setValue("using/customIAD",
+                        xtalopt->using_customIAD);
+
+
 
     // Composition
     // We only want to save POTCAR info and Composition to the resume
@@ -139,6 +150,26 @@ namespace XtalOpt {
       }
       settings->endArray();
     }
+
+    // ZF
+    if (xtalopt->using_customIAD==true) {
+        unsigned int length = ui.table_IAD->rowCount();
+        settings->beginWriteArray("customIAD");
+        for (uint i = 0; i < length; i++){
+            settings->setArrayIndex(i);
+            QString symbol1 = ui.table_IAD->item(i, IC_SYMBOL1)->text();
+            int atomicNum1 = OpenBabel::etab.GetAtomicNum(symbol1.trimmed().toStdString().c_str());
+            QString symbol2 = ui.table_IAD->item(i, IC_SYMBOL2)->text();
+            int atomicNum2 = OpenBabel::etab.GetAtomicNum(symbol2.trimmed().toStdString().c_str());
+        
+            settings->setValue("atomicNumber1",     atomicNum1);
+            settings->setValue("atomicNumber2",     atomicNum2);
+            settings->setValue("interatomicDist",     xtalopt->interComp[qMakePair<int, int>(atomicNum1, atomicNum2)].minIAD);
+        }
+        settings->endArray();
+    }
+    //
+    //
 
     settings->endGroup();
 
@@ -171,8 +202,12 @@ namespace XtalOpt {
     ui.spin_fixedVolume->setValue(	settings->value("limits/volume/fixed",	500).toDouble()	);
     ui.spin_scaleFactor->setValue(	settings->value("limits/scaleFactor",0.5).toDouble());
     ui.spin_minRadius->setValue(	  settings->value("limits/minRadius",0.25).toDouble());
-    ui.cb_fixedVolume->setChecked(	settings->value("using/fixedVolume",	false).toBool()	);
-    ui.cb_interatomicDistanceLimit->setChecked(	settings->value("using/interatomicDistanceLimit",false).toBool());
+    ui.cb_fixedVolume->setChecked(	settings->value("using/fixedVolume").toBool()	);
+    ui.cb_interatomicDistanceLimit->setChecked(	settings->value("using/interatomicDistanceLimit").toBool());
+    
+    // ZF
+    ui.cb_customIAD->setChecked( settings->value("using/customIAD").toBool());
+
 
     // Composition
     if (!filename.isEmpty()) {
@@ -191,6 +226,27 @@ namespace XtalOpt {
       settings->endArray();
     }
 
+    //ZF
+    if (xtalopt->using_customIAD==true) {
+        int size = settings->beginReadArray("customIAD");
+        xtalopt->interComp = QHash<QPair<int, int>, IAD> ();
+        for (int i = 0; i < size; i++){
+            settings->setArrayIndex(i);
+            int atomicNum1, atomicNum2;
+            IAD entry;
+            atomicNum1 = settings->value("atomicNumber1").toInt();
+            atomicNum2 = settings->value("atomicNumber2").toInt();
+            double interatomicDist = settings->value("interatomicDist").toDouble();
+            entry.minIAD = interatomicDist;
+            xtalopt->interComp[qMakePair<int, int>(atomicNum1, atomicNum2)] = entry;
+        }
+        this->updateCompositionTable();
+        this->updateMinIAD();
+        settings->endArray();
+    }
+    //
+    //
+
     settings->endGroup();
 
     // Update config data
@@ -199,13 +255,15 @@ namespace XtalOpt {
     case 1:
       ui.cb_interatomicDistanceLimit->setChecked(
             settings->value("using/shortestInteratomicDistance",false).toBool());
-    case 2:
+      ui.cb_customIAD->setChecked(
+            settings->value("using/customIAD",false).toBool());
     default:
       break;
     }
 
     // Enact changesSetup templates
     updateDimensions();
+    updateGUI();
   }
 
   void TabInit::updateGUI()
@@ -232,21 +290,26 @@ namespace XtalOpt {
     ui.cb_fixedVolume->setChecked( xtalopt->using_fixed_volume);
     ui.cb_interatomicDistanceLimit->setChecked(
           xtalopt->using_interatomicDistanceLimit);
-    updateComposition();
+    ui.cb_customIAD->setChecked(   xtalopt->using_customIAD);
+   updateComposition();
   }
 
   void TabInit::lockGUI()
   {
     ui.edit_composition->setDisabled(true);
+    ui.table_IAD->setDisabled(true);
   }
 
   void TabInit::getComposition(const QString &str)
   {
     XtalOpt *xtalopt = qobject_cast<XtalOpt*>(m_opt);
 
+    QHash<QPair<int, int>, IAD> interComp;
     QHash<uint, XtalCompositionStruct> comp;
     QString symbol;
+    QString symbol2;
     unsigned int atomicNum;
+    unsigned int atomicNum2;
     unsigned int quantity;
     QStringList symbolList;
     QStringList quantityList;
@@ -300,13 +363,46 @@ namespace XtalOpt {
       }
 
       comp[atomicNum].quantity += quantity;
+      
+      // ZF
+        for (uint j = 0; j < length; j++){
+            symbol2    = symbolList.at(j);
+            atomicNum2 = OpenBabel::etab.GetAtomicNum(
+                symbol2.trimmed().toStdString().c_str());
+        
+        // Validate symbol
+        // if (!atomicNum1) continue; // Invalid symbol entered
+        // if (!atomicNum2) continue; // Invalid symbol entered
+    
+            // Add twice to hash (if the two atoms are different)
+            if (!interComp.contains(qMakePair<int, int>(atomicNum, atomicNum2))) {
+                IAD entry;
+                entry.minIAD = OpenBabel::etab.GetCovalentRad(atomicNum) + OpenBabel::etab.GetCovalentRad(atomicNum2);
+                interComp[qMakePair<int, int>(atomicNum, atomicNum2)] = entry;
+            }
+            if (atomicNum!=atomicNum2){
+                if (!interComp.contains(qMakePair<int, int>(atomicNum2, atomicNum))) {
+                    IAD entry;
+                    entry.minIAD = OpenBabel::etab.GetCovalentRad(atomicNum) + OpenBabel::etab.GetCovalentRad(atomicNum2);
+                    interComp[qMakePair<int, int>(atomicNum2, atomicNum)] = entry;
+                }
+            }
+        }
+        //
+        //
     }
 
+    xtalopt->interComp = interComp; 
     xtalopt->comp = comp;
 
     this->updateMinRadii();
+    // ZF
+    this->updateMinIAD();
+    //
     this->updateCompositionTable();
-  }
+ 
+
+ }
 
   void TabInit::updateCompositionTable()
   {
@@ -318,7 +414,11 @@ namespace XtalOpt {
     // Adjust table size:
     int numRows = keys.size();
     ui.table_comp->setRowCount(numRows);
-
+    int numRows2 = keys.size();
+         for(int j = numRows2-1; j > 0; j--){
+            numRows2=numRows2+j;
+        }
+   int z = 0;
     for (int i = 0; i < numRows; i++) {
       unsigned int atomicNum = keys.at(i);
 
@@ -346,6 +446,33 @@ namespace XtalOpt {
       ui.table_comp->setItem(i, CC_QUANTITY, quantityItem);
       ui.table_comp->setItem(i, CC_MASS, massItem);
       ui.table_comp->setItem(i, CC_MINRADIUS, minRadiusItem);
+
+      //ZF
+      if (ui.cb_customIAD->isChecked()) {
+        ui.table_IAD->setRowCount(numRows2);
+         
+        for (int k = i; k < numRows; k++) {
+            unsigned int atomicNum2 = keys.at(k);
+            
+            QString symbol1 = QString(OpenBabel::etab.GetSymbol(atomicNum));
+            QString symbol2 = QString(OpenBabel::etab.GetSymbol(atomicNum2));
+            
+            QTableWidgetItem *symbol1Item =
+                new QTableWidgetItem(symbol1);
+            QTableWidgetItem *symbol2Item =
+                new QTableWidgetItem(symbol2);           
+
+            ui.table_IAD->setItem(z, IC_SYMBOL1, symbol1Item);
+            ui.table_IAD->setItem(z, IC_SYMBOL2, symbol2Item);
+           
+            QString valIAD = QString::number(xtalopt->interComp[qMakePair<int, int>(atomicNum, atomicNum2)].minIAD, 'f', 3);
+            QTableWidgetItem *iadItem =
+                new QTableWidgetItem(valIAD);
+            ui.table_IAD->setItem(z, IC_IAD, iadItem);
+
+            z++;
+        }
+      }
     }
   }
 
@@ -411,11 +538,18 @@ namespace XtalOpt {
       xtalopt->minRadius = ui.spin_minRadius->value();
       xtalopt->using_interatomicDistanceLimit =
           ui.cb_interatomicDistanceLimit->isChecked();
-      this->updateMinRadii();
       this->updateCompositionTable();
+      this->updateMinRadii();
     }
-  }
 
+    // ZF
+    if (xtalopt->using_customIAD != ui.cb_customIAD->isChecked()) {
+        xtalopt->using_customIAD = ui.cb_customIAD->isChecked();
+        this->updateMinIAD();
+        this->updateCompositionTable();
+    }
+    //
+  }
   void TabInit::updateMinRadii()
   {
     XtalOpt *xtalopt = qobject_cast<XtalOpt*>(m_opt);
@@ -432,4 +566,34 @@ namespace XtalOpt {
     }
   }
 
+  // ZF
+  void TabInit::updateMinIAD()
+  {
+    XtalOpt *xtalopt = qobject_cast<XtalOpt*>(m_opt);
+
+    QHash<QPair<int, int>, IAD> interComp;
+    
+    unsigned int length = ui.table_IAD->rowCount();
+
+
+    for (uint i = 0; i < length; i++){
+        QString symbol1 = ui.table_IAD->item(i, IC_SYMBOL1)->text();
+        int atomicNum1 = OpenBabel::etab.GetAtomicNum(symbol1.trimmed().toStdString().c_str());
+        QString symbol2 = ui.table_IAD->item(i, IC_SYMBOL2)->text();
+        int atomicNum2 = OpenBabel::etab.GetAtomicNum(symbol2.trimmed().toStdString().c_str());
+        QString strIAD = ui.table_IAD->item(i, IC_IAD)->text();
+        double valIAD = ui.table_IAD->item(i, IC_IAD)->text().toDouble();
+            QTableWidgetItem *iadItem =
+                new QTableWidgetItem(QString::number(valIAD, 'f', 3));
+            ui.table_IAD->setItem(i, IC_IAD, iadItem);
+       
+        interComp[qMakePair<int, int>(atomicNum1, atomicNum2)].minIAD = valIAD;
+        xtalopt->interComp[qMakePair<int, int>(atomicNum1, atomicNum2)].minIAD = valIAD;
+       
+        if (atomicNum1!=atomicNum2){
+            xtalopt->interComp[qMakePair<int, int>(atomicNum2, atomicNum1)].minIAD = valIAD;
+            interComp[qMakePair<int, int>(atomicNum2, atomicNum1)].minIAD = valIAD;
+        }
+    }
+  }
 }

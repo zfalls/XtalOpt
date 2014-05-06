@@ -137,7 +137,12 @@ namespace GlobalSearch {
       Duplicate,
       /** The Structure is about to restart it's current optimization
        * step. */
-      Restart
+      Restart,
+
+      // ZF
+      InteratomicDist
+      /** The Structure has two atoms that are too close to one another
+       * not consdiered for parent pool but will still fully optimize */
     };
 
     /** Whether the Structure has an enthalpy value set.

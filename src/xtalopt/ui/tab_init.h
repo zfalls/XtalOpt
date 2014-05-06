@@ -33,6 +33,15 @@ namespace XtalOpt {
     explicit TabInit( XtalOptDialog *parent, XtalOpt *p );
     virtual ~TabInit();
 
+    // ZF
+    enum IADColumns
+    {
+      IC_SYMBOL1 = 0,
+      IC_SYMBOL2 = 1,
+      IC_IAD = 2
+    };
+    //
+
     enum CompositionColumns
     {
       CC_SYMBOL = 0,
@@ -53,6 +62,9 @@ namespace XtalOpt {
     void updateDimensions();
     void updateMinRadii();
 
+    // ZF
+    void updateMinIAD();
+    //
   signals:
 
   private:

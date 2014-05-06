@@ -247,6 +247,7 @@ namespace GlobalSearch {
     settings->setValue("jobID", getJobID());
     settings->setValue("currentOptStep", getCurrentOptStep());
     settings->setValue("parents", getParents());
+    settings->setValue("dupString", getDuplicateString());
     settings->setValue("rempath", getRempath());
     settings->setValue("status", int(getStatus()));
     settings->setValue("failCount", getFailCount());
@@ -335,6 +336,7 @@ namespace GlobalSearch {
       setRank(           settings->value("rank",           0).toInt());
       setJobID(          settings->value("jobID",          0).toInt());
       setCurrentOptStep( settings->value("currentOptStep", 0).toInt());
+      setDuplicateString(settings->value("dupString",      "").toString());
       setFailCount(      settings->value("failCount",      0).toInt());
       setParents(        settings->value("parents",        "").toString());
       setRempath(        settings->value("rempath",        "").toString());
@@ -651,7 +653,11 @@ namespace GlobalSearch {
       status = "Killed";
       break;
     case Duplicate:
-      status = "Duplicate";
+      status = "Duplicate of %1";
+      break;
+    //ZF
+    case InteratomicDist:
+      status = "Outside IAD constraints";
       break;
     case Error:
       status = "Error";

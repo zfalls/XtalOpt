@@ -95,8 +95,10 @@ namespace XtalOpt {
     void clipPOSCARProgress();
     void enableRowTracking() {rowTracking = true;};
     void disableRowTracking() {rowTracking = false;};
+    void updateRank();
+    void clearFiles();
 
-  signals:
+signals:
     void deleteJob(int);
     void updateStatus(int opt, int run, int queue, int fail);
     void infoUpdate();

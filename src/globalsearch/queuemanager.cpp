@@ -85,6 +85,7 @@ namespace GlobalSearch {
     trackers.append(&m_newlyKilledTracker);
     trackers.append(&m_newDuplicateTracker);
     trackers.append(&m_restartTracker);
+    trackers.append(&m_iadTracker);
     trackers.append(&m_newSubmissionTracker);
 
     // Used to break wait loops if they take too long
@@ -172,6 +173,7 @@ namespace GlobalSearch {
     trackers.append(&m_newlyKilledTracker);
     trackers.append(&m_newDuplicateTracker);
     trackers.append(&m_restartTracker);
+    trackers.append(&m_iadTracker);
     trackers.append(&m_newSubmissionTracker);
 
     for (QList<Tracker*>::iterator
@@ -356,6 +358,7 @@ namespace GlobalSearch {
           m_newlyKilledTracker.contains(structure)    ||
           m_newDuplicateTracker.contains(structure)   ||
           m_restartTracker.contains(structure)        ||
+          m_iadTracker.contains(structure)            ||
           m_newSubmissionTracker.contains(structure)) {
         continue;
       }
@@ -407,6 +410,8 @@ namespace GlobalSearch {
       case Structure::Empty:
         handleEmptyStructure(structure);
         break;
+      case Structure::InteratomicDist:
+        handleInteratomicDistStructure(structure);
       }
     }
 
@@ -516,6 +521,19 @@ namespace GlobalSearch {
     }
 
     s->stopOptTimer();
+
+
+    // ZF
+QString err;
+    if (!m_opt->checkStepOptimizedStructure(s, &err)) {
+        //Structure failed a post optimization step:
+        m_opt->warning(QString("Structure %1 failed a post-optimization step: %2")
+        .arg(s->getIDString())
+        .arg(err));
+        s->setStatus(Structure::InteratomicDist);
+        emit structureUpdated(s);
+        return;
+    }
 
     // update optstep and relaunch if necessary
     if (s->getCurrentOptStep()
@@ -787,6 +805,39 @@ namespace GlobalSearch {
     return;
   }
   /// @endcond
+
+
+  // ZF
+  void QueueManager::handleInteratomicDistStructure(Structure *s) {
+     QWriteLocker locker (m_iadTracker.rwLock());
+      if (!m_iadTracker.append(s)) {
+         return;
+           }
+        QtConcurrent::run(this,
+        &QueueManager::handleInteratomicDistStructure_, s);
+  }
+ 
+  // Doxygen skip:
+  /// @cond
+  void QueueManager::handleInteratomicDistStructure_(Structure *s)
+  {
+    Q_ASSERT(trackerContainsStructure(s, &m_iadTracker));
+    removeFromTrackerWhenScopeEnds popper (s, &m_iadTracker);
+
+    if (s->getStatus() != Structure::Restart) {
+      return;
+    }
+      
+    // Ensure that the job is not tying up the queue
+    stopJob(s);
+     
+    // Remove from running tracker
+    m_runningTracker.lockForWrite();
+    m_runningTracker.remove(s);
+    m_runningTracker.unlock();
+
+  }
+
 
   void QueueManager::killStructure(Structure *s) {
     // End job if currently running
