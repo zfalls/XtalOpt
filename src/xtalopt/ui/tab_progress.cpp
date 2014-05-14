@@ -969,7 +969,7 @@ namespace XtalOpt {
             QDir dir(filePath+"/" +gen_s+ "x" +id_s);
             if(dir.exists()) {
                 Q_FOREACH(QFileInfo info, dir.entryInfoList(QDir::NoDotAndDotDot | QDir::System | QDir::Hidden  | QDir::AllDirs | QDir::Files, QDir::DirsFirst)) {
-                    if (info.fileName()=="POTCAR") {
+                    /*if (info.fileName()=="POTCAR") {
                         QFile file (info.filePath());
                         QFile newFile (filePath+"/POTCAR");
                         if (!newFile.exists()) {
@@ -979,15 +979,15 @@ namespace XtalOpt {
                             newFile.close();
                             dir.remove(info.fileName());
                         } else {
-                            dir.remove(info.fileName());
+                                dir.remove(info.fileName());
                         }
+                    }*/
                     if (info.fileName()!="CONTCAR" && info.fileName()!="structure.state" && info.fileName()!="OUTCAR" && info.fileName()!="POTCAR") {
-                        dir.remove(info.fileName());
+                            dir.remove(info.fileName());
                     }
                 }
             }
         }
     }
-   }
-}
+  }
 }

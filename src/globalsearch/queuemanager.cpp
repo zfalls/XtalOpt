@@ -795,7 +795,6 @@ QString err;
     s->lock()->lockForWrite();
     s->stopOptTimer();
     s->resetFailCount();
-    s->resetFixCount();
     s->setStatus(Structure::Updating);
     s->lock()->unlock();
     if (!m_opt->optimizer()->update(s)) {

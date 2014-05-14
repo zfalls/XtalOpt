@@ -91,7 +91,7 @@ namespace XtalOpt {
                                                   const QString &reason = "");
     bool checkLimits();
     bool checkXtal(Xtal *xtal, QString * err = NULL);
-    bool checkStepOptimizedStructure(GlobalSearch::Structure *s, QString *err = NULL);
+    bool checkStepOptimizedStructure(GlobalSearch::Structure* s, QString *err = NULL);
          
     QString interpretTemplate(const QString & templateString, GlobalSearch::Structure* structure);
     QString getTemplateKeywordHelp();

@@ -426,7 +426,7 @@ namespace XtalOpt {
     if (using_customIAD){
          for (int i = 0; i < atomicNums.size()-1; ++i) {
             for (int j = i + 1; j < atomicNums.size(); ++j) {
-                if (this->interComp.value(qMakePair<int, int>(atomicNums[i], atomicNums[i])).minIAD <
+                if (this->interComp.value(qMakePair<int, int>(atomicNums[i], atomicNums[i])).minIAD >
                         this->interComp.value(qMakePair<int, int>(atomicNums[j], atomicNums[j])).minIAD) {
                     atomicNums.swap(i,j);
                 }
@@ -451,7 +451,7 @@ namespace XtalOpt {
         for (uint i = 0; i < q; i++) {
             // ZF
             if (using_customIAD){
-                if (!xtal->addAtomRandomlyIAD(atomicNum, this-> comp, this->interComp, 1000)) {
+                if (!xtal->addAtomRandomlyIAD(atomicNum, this->comp, this->interComp, 1000)) {
                     xtal->deleteLater();
                     debug("XtalOpt::generateRandomXtal: Failed to add atoms with "
                         "specified custom interatomic distance.");
@@ -990,16 +990,11 @@ namespace XtalOpt {
   }
 
     bool XtalOpt::checkStepOptimizedStructure(Structure *s, QString *err) {
-        if (s == NULL) {
-            if (err != NULL) {
-                *err = "NULL pointer give for structure.";
-            }
-            return false;
-        }
 
         Xtal *xtal = qobject_cast<Xtal*>(s);
         uint totalOptSteps = m_optimizer->getNumberOfOptSteps();
-        uint currOptStep = s->getCurrentOptStep();
+        uint currOptStep = xtal->getCurrentOptStep();
+        uint fixCount = xtal->getFixCount();
 
         if (xtal == NULL) {
             return true;
@@ -1060,53 +1055,39 @@ namespace XtalOpt {
                         Atom *a1 = xtal->atom(atom1);
                         Atom *a2 = xtal->atom(atom2);
                     
-                        if (xtal->getFixCount() < 10) {
+                        if (fixCount < 10) {
                             int atomicNumber = (a2)->atomicNumber();  
-                            //xtal->lock()->lockForWrite();
-                            xtal->removeAtom(a2);
-                            xtal->removeAtom(xtal->atom(atom2));
-                            //Atom *a3 = xtal->addAtom();;
-
-                            if (xtal->addAtomRandomlyIAD(atomicNumber, this->comp, this->interComp, 1000)) {
-                              //  xtal->lock()->unlock();
-                                //xtal->addAtom(a3);
+                            Atom **atom = &a2;
+                            if (xtal->moveAtomRandomlyIAD(atomicNumber, this->comp, this->interComp, 9999, atom)) {
                                 continue;
                             } else {
-                                //xtal->lock()->unlock();
-                                //xtal->addAtom(a2);
                                 const double minIAD =
                                         this->interComp.value(qMakePair<int, int>(a1->atomicNumber(), atomicNumber)).minIAD;
-                                        xtal->setStatus(Xtal::InteratomicDist);
+                                        s->setStatus(Xtal::InteratomicDist);
 
                                 qDebug() << "Discarding structure -- Bad IAD ("
                                         << IAD << " < "
-                                        << minIAD << ")";
-                                if (err != NULL) {
-                                        *err = "Could not fix the IAD issue.";        
-                                }
+                                        << minIAD << ") \n Could not fix the IAD issue.";        
                                 return false;
                             }
                         } else {
                             const double minIAD =
                                     this->interComp.value(qMakePair<int, int>(a1->atomicNumber(), a2->atomicNumber())).minIAD;
-                                    xtal->setStatus(Xtal::InteratomicDist);
+                                    s->setStatus(Xtal::InteratomicDist);
 
                             qDebug() << "Discarding structure -- Bad IAD ("
                                     << IAD << " < "
-                                    << minIAD << ")";
-                            if (err != NULL) {
-                                    *err = "Exceeded the number of fixes.";        
-                            }
+                                    << minIAD << ") \n Exceeded the number of fixes.";        
                             return false;
                         }
                     } else {
                         if (i>0) {
-                            //xtal->lock()->lockForWrite();
-                            xtal->setFixCount(xtal->getFixCount() + 1);
-                            s->setCurrentOptStep(1);
-                            //xtal->lock()->unlock();
+                            s->setFixCount(fixCount + 1);
+                            s->setCurrentOptStep(0);
+                            break;
+                        } else {
+                            break;
                         }
-                        break;
                     }
                 }
                 return true;
