@@ -203,6 +203,13 @@ namespace GlobalSearch {
      */
     double getPV()	const {return m_PV;};
 
+    //
+    //
+    int getFixCount() const {return m_fixCount;};
+    
+    void setFixCount( int fixCount) {m_fixCount = fixCount;};
+
+
     /** Returns an energetic ranking set by setRank(uint).
      * @return the energetic ranking.
      * @sa setRank
@@ -1075,7 +1082,7 @@ namespace GlobalSearch {
     /// \cond
     bool m_hasEnthalpy, m_updatedSinceDupChecked;
     bool m_histogramGenerationPending;
-    uint m_generation, m_id, m_rank, m_jobID, m_currentOptStep, m_failCount;
+    uint m_generation, m_id, m_rank, m_jobID, m_currentOptStep, m_failCount, m_fixCount;
     QString m_parents, m_dupString, m_rempath;
     double m_enthalpy, m_PV;
     State m_status;

@@ -97,6 +97,8 @@ namespace XtalOpt {
 //ZF    
     connect(ui.push_rank, SIGNAL(clicked()),
             this, SLOT(updateRank()));
+    connect(ui.push_print, SIGNAL(clicked()),
+            this, SLOT(printFile()));
     connect(ui.push_clear, SIGNAL(clicked()),
             this, SLOT(clearFiles()));
 
@@ -332,17 +334,19 @@ namespace XtalOpt {
       xtalLocker.relock();
       switch (state) {
       case QueueInterface::Running:
-        e.status = tr("Running (Opt Step %1 of %2, %3 failures)")
+        e.status = tr("Running (Opt Step %1 of %2, %3 failures, %4 fixes)")
           .arg(QString::number(xtal->getCurrentOptStep()))
           .arg(QString::number(totalOptSteps))
-          .arg(QString::number(xtal->getFailCount()));
+          .arg(QString::number(xtal->getFailCount()))
+          .arg(QString::number(xtal->getFixCount()));
         e.brush.setColor(Qt::green);
         break;
       case QueueInterface::Queued:
-        e.status = tr("Queued (Opt Step %1 of %2, %3 failures)")
+        e.status = tr("Queued (Opt Step %1 of %2, %3 failures, %4 fixes)")
           .arg(QString::number(xtal->getCurrentOptStep()))
           .arg(QString::number(totalOptSteps))
-          .arg(QString::number(xtal->getFailCount()));
+          .arg(QString::number(xtal->getFailCount()))
+          .arg(QString::number(xtal->getFixCount()));
         e.brush.setColor(Qt::cyan);
         break;
       case QueueInterface::Success:
@@ -415,9 +419,11 @@ namespace XtalOpt {
       break;
     // ZF
     case Xtal::InteratomicDist:
-      e.status = "Two atoms are too close together";
+      e.status = tr("IAD (Opt Step %1 of %2)")
+        .arg(QString::number(xtal->getCurrentOptStep()))
+        .arg(QString::number(totalOptSteps));
       e.brush.setColor(Qt::magenta);
-      break;
+    break;
     }
 
     if (xtal->getFailCount() != 0) {
@@ -940,6 +946,63 @@ namespace XtalOpt {
         }
     }
   }
+
+  void TabProgress::printFile() {
+              QFile file;
+                  file.setFileName(m_opt->filePath + "/run-results.txt");
+                      if (!file.open(QIODevice::WriteOnly)) {
+                                m_opt->error("XtalOptTest::writeDataFile(): Error opening file "+file.fileName()+" for writing...");
+                                    }
+                          QTextStream out;
+                              out.setDevice(&file);
+                                  m_opt->tracker()->lockForRead();
+                                      QList<Structure*> *structures = m_opt->tracker()->list();
+                                          Xtal *xtal;
+
+                                              // Print the data to the file:
+     out << "Index\tGen\tID\tEnthalpy\tSpaceGroup\tStatus\tParentage\n";
+         for (int i = 0; i < structures->size(); i++) {
+               xtal = qobject_cast<Xtal*>(structures->at(i));
+                     if (!xtal) continue; // In case there was a problem copying.
+                           xtal->lock()->lockForRead();
+                                 out << i << "\t"
+                                           << xtal->getGeneration() << "\t"
+                                                     << xtal->getIDNumber() << "\t"
+                                                               << xtal->getEnthalpy() << "\t\t"
+                                              << xtal->getSpaceGroupNumber() << ": " << xtal->getSpaceGroupSymbol() << "\t\t";
+      // Status:
+            switch (xtal->getStatus()) {
+                  case Xtal::Optimized:
+                          out << "Optimized";
+                                  break;
+                                        case Xtal::Killed:
+                                              case Xtal::Removed:
+                                                      out << "Killed";
+                                                              break;
+  case Xtal::Duplicate:
+          out << "Duplicate";
+                  break;
+                        case Xtal::Error:
+                                out << "Error";
+                                        break;
+                                              case Xtal::StepOptimized:
+                                                    case Xtal::WaitingForOptimization:
+   case Xtal::InProcess:
+         case Xtal::Empty:
+               case Xtal::Updating:
+                     case Xtal::Submitted:
+                           default:
+                                   out << "In progress";
+                                           break;
+                                                 }
+                                                       // Parentage:
+          out << "\t" << xtal->getParents();
+                xtal->lock()->unlock();
+                      out << endl;
+                          }
+                              m_opt->tracker()->unlock();
+                                }
+
 
   void TabProgress::clearFiles()
   {

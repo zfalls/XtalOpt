@@ -76,8 +76,16 @@ namespace XtalOpt {
     bool addAtomRandomlyIAD(unsigned int atomicNumber,
                          const QHash<unsigned int, XtalCompositionStruct> & limits,
                          const QHash<QPair<int, int>, IAD> &limitsIAD,
+                         double maxRad = 3.0,
                          int maxAttempts = 100.0,
                          Avogadro::Atom **atom = 0);
+    bool moveAtomRandomlyIAD(unsigned int atomicNumber,
+                         const QHash<unsigned int, XtalCompositionStruct> & limits,
+                         const QHash<QPair<int, int>, IAD> &limitsIAD,
+                         double maxRad = 3.0,
+                         int maxAttempts = 100.0,
+                         Avogadro::Atom **atom = 0);
+
     bool fillSuperCell(int a, int b, int c, Xtal * myXtal);
 
     // Use the minIAD constraints in @a limitsIAD to check the interatomic

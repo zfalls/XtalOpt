@@ -169,7 +169,7 @@ m_queue->unlockForNaming(newStructure);
      * for optimization)
      * @param failing Number of structures with a getFailCount() > 0
      */
-    void newStatusOverview(int optimized, int running, int failing);
+    void newStatusOverview(int optimized, int iad, int running, int failing);
 
     // Work around for Qt 4.6.3
 #if QT_VERSION == 0x040603
