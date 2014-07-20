@@ -97,7 +97,7 @@ namespace XtalOpt {
     emit sig_updateProgressDialog();
     // Perform run
     emit status();
-    resetOpt();
+    //resetOpt();
     m_opt->startSearch();
     emit status();
     m_message = "Looping...";
@@ -151,6 +151,7 @@ namespace XtalOpt {
       if (state == Xtal::Optimized ||
           state == Xtal::Killed ||
           state == Xtal::Duplicate ||
+          state == Xtal::InteratomicDist ||
           state == Xtal::Removed)
         done++;
     }
@@ -171,6 +172,7 @@ namespace XtalOpt {
       xtal->lock()->unlock();
       if (state == Xtal::InProcess ||
           state == Xtal::Optimized ||
+          state == Xtal::InteratomicDist ||
           state == Xtal::Submitted ||
           state == Xtal::Killed ||
           state == Xtal::Restart ||
@@ -215,6 +217,9 @@ namespace XtalOpt {
       switch (xtal->getStatus()) {
       case Xtal::Optimized:
         out << "Optimized";
+        break;
+      case Xtal::InteratomicDist:
+        out << "IAD";
         break;
       case Xtal::Killed:
       case Xtal::Removed:

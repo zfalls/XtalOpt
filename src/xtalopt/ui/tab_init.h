@@ -38,7 +38,8 @@ namespace XtalOpt {
     {
       IC_SYMBOL1 = 0,
       IC_SYMBOL2 = 1,
-      IC_IAD = 2
+      IC_MINIAD = 2,
+      IC_MAXIAD = 3
     };
     //
 

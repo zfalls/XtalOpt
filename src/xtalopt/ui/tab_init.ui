@@ -606,7 +606,39 @@ able to create offspring that meet this restriction.</string>
         </property>
        </widget>
       </item>
-      <item row="16" column="0" colspan="4">
+      <item row="16" column="0" colspan="1">
+       <widget class="QLabel" name="label_69">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="text">
+         <string>Maximum radius (Å):</string>
+        </property>
+        <property name="buddy">
+         <cstring>spin_maxRadius</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="16" column="1">
+       <widget class="QDoubleSpinBox" name="spin_maxRadius">
+        <property name="enabled">
+         <bool>true</bool>
+        </property>
+        <property name="suffix">
+         <string> Å</string>
+        </property>
+        <property name="decimals">
+         <number>2</number>
+        </property>
+        <property name="singleStep">
+         <double>0.050000000000000</double>
+        </property>
+        <property name="value">
+         <double>3.0000000000000</double>
+        </property>
+       </widget>
+      </item>
+      <item row="17" column="0" colspan="4">
        <widget class="QTableWidget" name="table_IAD">
         <property name="sortingEnabled">
          <bool>true</bool>
@@ -633,6 +665,11 @@ able to create offspring that meet this restriction.</string>
         <column>
          <property name="text">
           <string>Min. IAD</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Max. IAD</string>
          </property>
         </column>
        </widget>

@@ -47,6 +47,7 @@ namespace XtalOpt {
 // ZF
     struct IAD {
         double minIAD;
+        double maxIAD;
     };
 
 
@@ -136,6 +137,7 @@ namespace XtalOpt {
 // ZF
     bool using_customIAD;
     bool using_checkStepOpt;
+    double maxRadius;
     QHash<QPair<int, int>, IAD> interComp;
 
     QHash<uint, XtalCompositionStruct> comp;

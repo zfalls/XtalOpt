@@ -757,10 +757,14 @@ namespace XtalOpt {
         unsigned int atomicNumber,
         const QHash<unsigned int, XtalCompositionStruct> & limits,
         const QHash<QPair<int, int>, IAD> &limitsIAD,
-        int maxAttempts, Avogadro::Atom **atom)
+        double maxRad, 
+        int maxAttempts, 
+        Avogadro::Atom **atom)
     {
         Eigen::Vector3d cartCoords;
         bool success;
+
+        double maxRadSquared = maxRad*maxRad;
 
         // For first atom, add to 0, 0, 0
         if (numAtoms() == 0) {
@@ -790,14 +794,14 @@ namespace XtalOpt {
                     double &curDistSquared = squaredDists[dist_ind];
                     // Save a bit of time if distance is huge...
                     // Compare distance to minimum:
-                        
+                    
                     double minDist = limitsIAD.value(qMakePair<int, int>(atomicNumber, this->atom(dist_ind)->atomicNumber())).minIAD;
                     double minDistSquared = minDist * minDist;
 
-                    double maxDist = 2.0*minDist;
+                    double maxDist = limitsIAD.value(qMakePair<int, int>(atomicNumber, this->atom(dist_ind)->atomicNumber())).maxIAD;
                     double maxDistSquared = maxDist*maxDist;
                         
-                       if (curDistSquared < 9.0) {
+                       if (curDistSquared < maxRadSquared) {
                             if (curDistSquared > maxDistSquared) {
                                 qDebug() <<"XtalOpt::addAtomRandomlyIAD: Failed to add atoms with " 
                                       "specified interatomic distance. Distance too large";
@@ -828,10 +832,14 @@ namespace XtalOpt {
         unsigned int atomicNumber,
         const QHash<unsigned int, XtalCompositionStruct> & limits,
         const QHash<QPair<int, int>, IAD> &limitsIAD,
-        int maxAttempts, Avogadro::Atom **atom)
+        double maxRad, 
+        int maxAttempts, 
+        Avogadro::Atom **atom)
     {
         Eigen::Vector3d cartCoords;
         bool success;
+
+        double maxRadSquared = maxRad*maxRad;
 
         // For first atom, add to 0, 0, 0
         if (numAtoms() == 0) {
@@ -865,10 +873,10 @@ namespace XtalOpt {
                     double minDist = limitsIAD.value(qMakePair<int, int>(atomicNumber, this->atom(dist_ind)->atomicNumber())).minIAD;
                     double minDistSquared = minDist*minDist;
 
-                    double maxDist = 2.0*minDist;
+                    double maxDist = limitsIAD.value(qMakePair<int, int>(atomicNumber, this->atom(dist_ind)->atomicNumber())).maxIAD;
                     double maxDistSquared = maxDist*maxDist;
                         
-                        if (curDistSquared < 9.0) {
+                        if (curDistSquared < maxRadSquared) {
                             if (curDistSquared > maxDistSquared) {
                                 qDebug() <<"XtalOpt::moveAtomRandomlyIAD: Failed to add atoms with " 
                                       "specified interatomic distance. Distance too large";

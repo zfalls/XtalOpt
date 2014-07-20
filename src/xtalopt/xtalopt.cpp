@@ -451,7 +451,7 @@ namespace XtalOpt {
         for (uint i = 0; i < q; i++) {
             // ZF
             if (using_customIAD){
-                if (!xtal->addAtomRandomlyIAD(atomicNum, this->comp, this->interComp, 1000)) {
+                if (!xtal->addAtomRandomlyIAD(atomicNum, this->comp, this->interComp, maxRadius, 1000)) {
                     xtal->deleteLater();
                     debug("XtalOpt::generateRandomXtal: Failed to add atoms with "
                         "specified custom interatomic distance.");
@@ -1058,7 +1058,7 @@ namespace XtalOpt {
                         if (fixCount < 10) {
                             int atomicNumber = (a2)->atomicNumber();  
                             Atom **atom = &a2;
-                            if (xtal->moveAtomRandomlyIAD(atomicNumber, this->comp, this->interComp, 9999, atom)) {
+                            if (xtal->moveAtomRandomlyIAD(atomicNumber, this->comp, this->interComp, maxRadius, 9999, atom)) {
                                 continue;
                             } else {
                                 const double minIAD =
