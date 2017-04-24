@@ -165,6 +165,8 @@ namespace GlobalSearch {
       else return false;
     }
 
+        int getFixCount() const {return m_fixCount;};
+
     /** Return the energy value of the structure in eV.
      *
      * @return The energy of the structure in eV.
@@ -902,6 +904,10 @@ namespace GlobalSearch {
        */
     virtual unsigned int sizeOfHistory() {return m_histEnergies.size();};
 
+
+    void setFixCount( int fixCount) {m_fixCount = fixCount;};
+
+
     /** Set the energy in eV.
      * @param energy The Structure's energy in eV.
      * @sa getEnergy
@@ -1209,7 +1215,7 @@ namespace GlobalSearch {
                      m_skippedOptimization, m_supercellGenerationChecked;
     bool m_histogramGenerationPending;
     uint m_generation, m_id, m_rank, m_jobID,
-         m_currentOptStep, m_failCount;
+         m_currentOptStep, m_failCount, m_fixCount;
     QString m_parents, m_dupString, m_supString, m_rempath, m_fileName;
     double m_energy, m_enthalpy, m_PV;
     State m_status;

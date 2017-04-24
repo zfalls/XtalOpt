@@ -32,6 +32,7 @@ namespace XtalOpt {
   using GlobalSearch::Matrix3;
   using GlobalSearch::Vector3;
 
+  class IAD;
   class Xtal : public GlobalSearch::Structure
   {
     Q_OBJECT
@@ -82,6 +83,21 @@ namespace XtalOpt {
                          const QHash<QPair<int, int>, MolUnit> & limitsMolUnit,
                          bool useMolUnit,
                          int maxAttempts = 100.0);
+
+    bool checkMinIAD(const QHash<QPair<int, int>, IAD> &limits,
+                                   int *atom1 = NULL, int *atom2 = NULL,
+                                   double *IAD = NULL);
+    bool addAtomRandomlyIAD(unsigned int atomicNumber,
+                         const QHash<unsigned int, XtalCompositionStruct> & limits,
+                         const QHash<QPair<int, int>, IAD> &limitsIAD,
+                         double maxRad = 3.0,
+                         int maxAttempts = 100.0);
+    bool moveAtomRandomlyIAD(unsigned int atomicNumber,
+                         const QHash<unsigned int, XtalCompositionStruct> & limits,
+                         const QHash<QPair<int, int>, IAD> &limitsIAD,
+                         double maxRad = 3.0,
+                         int maxAttempts = 100.0,
+                         GlobalSearch::Atom *atom = 0);
 
     // Build molUnit given a tempMolecule with a center atom defined
     bool molUnitBuilder(Vector3 centerCoords, unsigned int atomicNum, int valence, double dist, int hyb);

@@ -16,6 +16,11 @@
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
+  <property name="font">
+   <font>
+    <pointsize>10</pointsize>
+   </font>
+  </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
@@ -35,129 +40,6 @@
       <string>Composition</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_6">
-      <item row="0" column="0">
-       <widget class="QLabel" name="label_14">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>18</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>11</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Empirical Formula:</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-        <property name="buddy">
-         <cstring>edit_composition</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1">
-       <widget class="QLineEdit" name="edit_composition">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>18</height>
-         </size>
-        </property>
-        <property name="baseSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>11</pointsize>
-         </font>
-        </property>
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Type the composition of the crystal here. Use only empirical formulas. It will be reduced to its empirical formula otherwise.&lt;/p&gt;&lt;p&gt;You may change formula units in the &amp;quot;Formula Units&amp;quot; section on this page.&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Examples:&lt;/p&gt;&lt;p&gt;ti1o2&lt;/p&gt;&lt;p&gt;Ti1O2&lt;/p&gt;&lt;p&gt;TI1O2&lt;/p&gt;&lt;p&gt;Ti1 O2&lt;/p&gt;&lt;p&gt;Ti 1 o 2&lt;/p&gt;&lt;p&gt;etc.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="label_19">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>18</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>11</pointsize>
-         </font>
-        </property>
-        <property name="text">
-         <string>Formula Units:</string>
-        </property>
-        <property name="alignment">
-         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
-        </property>
-        <property name="buddy">
-         <cstring>edit_formula_units</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QLineEdit" name="edit_formula_units">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="minimumSize">
-         <size>
-          <width>0</width>
-          <height>18</height>
-         </size>
-        </property>
-        <property name="baseSize">
-         <size>
-          <width>0</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="font">
-         <font>
-          <pointsize>11</pointsize>
-         </font>
-        </property>
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter the numbers of formula units separated by commas and hyphens to be searched here. The text box will be updated with the program's interpretation of your input after exiting the box or pressing return.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Examples:&lt;/p&gt;&lt;p&gt;1 , 3&lt;/p&gt;&lt;p&gt;1 - 4&lt;/p&gt;&lt;p&gt;1 - 3, 5, 7 - 9&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>1</string>
-        </property>
-       </widget>
-      </item>
       <item row="2" column="0" colspan="2">
        <widget class="QTableWidget" name="table_comp">
         <property name="sizePolicy">
@@ -229,6 +111,129 @@
           <string>Min. Radius</string>
          </property>
         </column>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QLabel" name="label_14">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>18</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Empirical Formula:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="buddy">
+         <cstring>edit_composition</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <widget class="QLineEdit" name="edit_composition">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>18</height>
+         </size>
+        </property>
+        <property name="baseSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Type the composition of the crystal here. Use only empirical formulas. It will be reduced to its empirical formula otherwise.&lt;/p&gt;&lt;p&gt;You may change formula units in the &amp;quot;Formula Units&amp;quot; section on this page.&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Examples:&lt;/p&gt;&lt;p&gt;ti1o2&lt;/p&gt;&lt;p&gt;Ti1O2&lt;/p&gt;&lt;p&gt;TI1O2&lt;/p&gt;&lt;p&gt;Ti1 O2&lt;/p&gt;&lt;p&gt;Ti 1 o 2&lt;/p&gt;&lt;p&gt;etc.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="label_19">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>18</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Formula Units:</string>
+        </property>
+        <property name="alignment">
+         <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+        </property>
+        <property name="buddy">
+         <cstring>edit_formula_units</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QLineEdit" name="edit_formula_units">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+        <property name="minimumSize">
+         <size>
+          <width>0</width>
+          <height>18</height>
+         </size>
+        </property>
+        <property name="baseSize">
+         <size>
+          <width>0</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enter the numbers of formula units separated by commas and hyphens to be searched here. The text box will be updated with the program's interpretation of your input after exiting the box or pressing return.&lt;/p&gt;&lt;p&gt;&lt;br/&gt;&lt;/p&gt;&lt;p&gt;Examples:&lt;/p&gt;&lt;p&gt;1 , 3&lt;/p&gt;&lt;p&gt;1 - 4&lt;/p&gt;&lt;p&gt;1 - 3, 5, 7 - 9&lt;br/&gt;&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>1</string>
+        </property>
        </widget>
       </item>
      </layout>
@@ -937,7 +942,7 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="0" rowspan="2">
+   <item row="1" column="0" rowspan="3">
     <widget class="QGroupBox" name="groupBox_3">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -949,22 +954,40 @@
       <string>Interatomic Distances</string>
      </property>
      <layout class="QGridLayout" name="gridLayout_4">
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="cb_useMolUnit">
-        <property name="font">
-         <font>
-          <pointsize>11</pointsize>
-         </font>
+      <item row="4" column="0" colspan="5">
+       <widget class="QTableWidget" name="table_IAD">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
         </property>
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;By enabling, allows the user the freedom to select atom types from the above composition to generate &amp;quot;molecular units&amp;quot;.&lt;/p&gt;&lt;p&gt;**This is currently limited to single-center moelcules with 1-6 coordinated atoms to the central atom.**&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
-        <property name="text">
-         <string>Create molecular units</string>
-        </property>
+        <attribute name="horizontalHeaderStretchLastSection">
+         <bool>true</bool>
+        </attribute>
+        <column>
+         <property name="text">
+          <string>Atom 1</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Atom 2</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Min. IAD</string>
+         </property>
+        </column>
+        <column>
+         <property name="text">
+          <string>Max. IAD</string>
+         </property>
+        </column>
        </widget>
       </item>
-      <item row="1" column="0" colspan="5">
+      <item row="6" column="0" colspan="5">
        <widget class="QTableWidget" name="table_molUnit">
         <property name="enabled">
          <bool>false</bool>
@@ -1042,7 +1065,22 @@
         </column>
        </widget>
       </item>
-      <item row="2" column="0">
+      <item row="5" column="0">
+       <widget class="QCheckBox" name="cb_useMolUnit">
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;By enabling, allows the user the freedom to select atom types from the above composition to generate &amp;quot;molecular units&amp;quot;.&lt;/p&gt;&lt;p&gt;**This is currently limited to single-center moelcules with 1-6 coordinated atoms to the central atom.**&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Create molecular units</string>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0">
        <spacer name="horizontalSpacer">
         <property name="orientation">
          <enum>Qt::Horizontal</enum>
@@ -1055,7 +1093,7 @@
         </property>
        </spacer>
       </item>
-      <item row="2" column="1">
+      <item row="7" column="1">
        <widget class="QPushButton" name="pushButton_addMolUnit">
         <property name="enabled">
          <bool>false</bool>
@@ -1073,7 +1111,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="2" colspan="2">
+      <item row="7" column="2" colspan="2">
        <widget class="QPushButton" name="pushButton_removeMolUnit">
         <property name="enabled">
          <bool>false</bool>
@@ -1091,7 +1129,7 @@
         </property>
        </widget>
       </item>
-      <item row="2" column="4">
+      <item row="7" column="4">
        <widget class="QPushButton" name="pushButton_removeAllMolUnit">
         <property name="enabled">
          <bool>false</bool>
@@ -1109,7 +1147,7 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="0">
+      <item row="8" column="0">
        <widget class="QCheckBox" name="cb_interatomicDistanceLimit">
         <property name="sizePolicy">
          <sizepolicy hsizetype="Minimum" vsizetype="Preferred">
@@ -1136,7 +1174,7 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="1" colspan="2">
+      <item row="8" column="1" colspan="2">
        <widget class="QLabel" name="label">
         <property name="enabled">
          <bool>false</bool>
@@ -1163,7 +1201,7 @@
         </property>
        </widget>
       </item>
-      <item row="3" column="3" colspan="2">
+      <item row="8" column="3" colspan="2">
        <widget class="QDoubleSpinBox" name="spin_scaleFactor">
         <property name="enabled">
          <bool>false</bool>
@@ -1216,7 +1254,7 @@ able to create offspring that meet this restriction.</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="1" colspan="2">
+      <item row="9" column="1" colspan="2">
        <widget class="QLabel" name="label_9">
         <property name="enabled">
          <bool>false</bool>
@@ -1243,7 +1281,7 @@ able to create offspring that meet this restriction.</string>
         </property>
        </widget>
       </item>
-      <item row="4" column="3" colspan="2">
+      <item row="9" column="3" colspan="2">
        <widget class="QDoubleSpinBox" name="spin_minRadius">
         <property name="enabled">
          <bool>false</bool>
@@ -1279,30 +1317,61 @@ able to create offspring that meet this restriction.</string>
         </property>
        </widget>
       </item>
-     </layout>
-    </widget>
-   </item>
-   <item row="1" column="1">
-    <widget class="QGroupBox" name="groupBox_11">
-     <property name="title">
-      <string>Space-group Generation</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="cb_allowRandSpg">
+      <item row="2" column="4">
+       <widget class="QDoubleSpinBox" name="spin_maxRadius">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
+       </widget>
+      </item>
+      <item row="2" column="2">
+       <widget class="QLabel" name="label_10">
         <property name="font">
          <font>
           <pointsize>11</pointsize>
          </font>
         </property>
-        <property name="toolTip">
-         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use RandSpg, a built-in program for generating random crystals with space groups, to create the initial generation.&lt;br/&gt;&lt;/p&gt;&lt;p&gt;You may select the space groups to be generated with the &amp;quot;Spg Options&amp;quot; button on the right. If you do not select space groups, it will select them randomly based upon which space groups may be generated.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-        </property>
         <property name="text">
-         <string>Initialize with RandSpg?</string>
+         <string>Maximum radius (A):</string>
         </property>
        </widget>
       </item>
+      <item row="2" column="0">
+       <widget class="QCheckBox" name="cb_customIAD">
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Custom IAD</string>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="cb_checkStepOpt">
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="text">
+         <string>Check Step</string>
+        </property>
+       </widget>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item row="3" column="1">
+    <widget class="QGroupBox" name="groupBox_11">
+     <property name="title">
+      <string>Space-group Generation</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="1">
        <widget class="QPushButton" name="push_spgOptions">
         <property name="enabled">
@@ -1318,6 +1387,21 @@ able to create offspring that meet this restriction.</string>
         </property>
         <property name="text">
          <string>Spg Options</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="0">
+       <widget class="QCheckBox" name="cb_allowRandSpg">
+        <property name="font">
+         <font>
+          <pointsize>11</pointsize>
+         </font>
+        </property>
+        <property name="toolTip">
+         <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Use RandSpg, a built-in program for generating random crystals with space groups, to create the initial generation.&lt;br/&gt;&lt;/p&gt;&lt;p&gt;You may select the space groups to be generated with the &amp;quot;Spg Options&amp;quot; button on the right. If you do not select space groups, it will select them randomly based upon which space groups may be generated.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+        </property>
+        <property name="text">
+         <string>Initialize with RandSpg?</string>
         </property>
        </widget>
       </item>
@@ -1568,19 +1652,6 @@ able to create offspring that meet this restriction.</string>
          <string>Export subcells?</string>
         </property>
        </widget>
-      </item>
-      <item row="4" column="0">
-       <spacer name="verticalSpacer">
-        <property name="orientation">
-         <enum>Qt::Vertical</enum>
-        </property>
-        <property name="sizeHint" stdset="0">
-         <size>
-          <width>20</width>
-          <height>40</height>
-         </size>
-        </property>
-       </spacer>
       </item>
      </layout>
     </widget>

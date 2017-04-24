@@ -115,6 +115,15 @@ namespace XtalOpt {
     connect(ui.cb_interatomicDistanceLimit, SIGNAL(toggled(bool)),
             this, SLOT(updateDimensions()));
 
+    connect(ui.cb_customIAD, SIGNAL(toggled(bool)),
+            this, SLOT(updateDimensions()));
+    connect(ui.cb_checkStepOpt, SIGNAL(toggled(bool)),
+            this, SLOT(updateDimensions()));
+    connect(ui.spin_maxRadius, SIGNAL(valueChanged(double)),
+            this, SLOT(updateDimensions()));
+    connect(ui.table_IAD, SIGNAL(itemSelectionChanged()),
+            this, SLOT(updateMinIAD()));
+
     // MolUnit builder
     connect(ui.cb_useMolUnit, SIGNAL(toggled(bool)),
             this, SLOT(updateDimensions()));
@@ -200,6 +209,12 @@ namespace XtalOpt {
                        xtalopt->using_interatomicDistanceLimit);
     settings->setValue("using/molUnit",      xtalopt->using_molUnit);
 
+    settings->setValue("using/customIAD",
+                        xtalopt->using_customIAD);
+    settings->setValue("limits/maxRadius",    xtalopt->maxRadius);
+    settings->setValue("using/checkStepOpt",
+                        xtalopt->using_checkStepOpt);
+
     // Composition
     // We only want to save POTCAR info and Composition to the resume
     // file, not the main config file, so only dump the data here if
@@ -241,6 +256,25 @@ namespace XtalOpt {
                            ui.table_molUnit->item(i, IC_DIST)->text());
       }
       settings->endArray();
+    }
+
+    // Custom IAD Composition
+    if (xtalopt->using_customIAD==true) {
+        unsigned int length = ui.table_IAD->rowCount();
+        settings->beginWriteArray("customIAD");
+        for (uint i = 0; i < length; i++){
+            settings->setArrayIndex(i);
+            QString symbol1 = ui.table_IAD->item(i, IC_SYMBOL1)->text();
+            int atomicNum1 = ElemInfo::getAtomicNum(symbol1.trimmed().toStdString());
+            QString symbol2 = ui.table_IAD->item(i, IC_SYMBOL2)->text();
+            int atomicNum2 = ElemInfo::getAtomicNum(symbol2.trimmed().toStdString());
+
+            settings->setValue("atomicNumber1",     atomicNum1);
+            settings->setValue("atomicNumber2",     atomicNum2);
+            settings->setValue("minInteratomicDist",     xtalopt->interComp[qMakePair<int, int>(atomicNum1, atomicNum2)].minIAD);
+            settings->setValue("maxInteratomicDist",     xtalopt->interComp[qMakePair<int, int>(atomicNum1, atomicNum2)].maxIAD);
+        }
+        settings->endArray();
     }
 
     // Formula Units List
@@ -287,6 +321,11 @@ namespace XtalOpt {
     ui.spin_minRadius->setValue(    settings->value("limits/minRadius",0.25).toDouble());
     ui.cb_fixedVolume->setChecked(	settings->value("using/fixedVolume",	false).toBool()	);
     ui.cb_interatomicDistanceLimit->setChecked( settings->value("using/interatomicDistanceLimit",false).toBool());
+    
+    ui.cb_customIAD->setChecked( settings->value("using/customIAD").toBool());
+    ui.spin_maxRadius->setValue(      settings->value("limits/maxRadius", 3.00).toDouble());
+    ui.cb_checkStepOpt->setChecked( settings->value("using/checkStepOpt").toBool());
+    
     ui.cb_mitosis->setChecked(      settings->value("using/mitosis",       false).toBool()     );
     ui.cb_subcellPrint->setChecked(      settings->value("using/subcellPrint",       false).toBool()     );
     ui.cb_useMolUnit->setChecked(      settings->value("using/molUnit",       false).toBool()     );
@@ -387,6 +426,26 @@ namespace XtalOpt {
         settings->endArray();
     }
 
+    // Custom IAD
+    if (xtalopt->using_customIAD==true) {
+    int size = settings->beginReadArray("customIAD");
+    xtalopt->interComp = QHash<QPair<int, int>, IAD> ();
+    for (int i = 0; i < size; i++){
+        settings->setArrayIndex(i);
+        int atomicNum1, atomicNum2;
+        IAD entry;
+        atomicNum1 = settings->value("atomicNumber1").toInt();
+        atomicNum2 = settings->value("atomicNumber2").toInt();
+        double minInteratomicDist = settings->value("minInteratomicDist").toDouble();
+        double maxInteratomicDist = settings->value("maxInteratomicDist").toDouble();
+        entry.minIAD = minInteratomicDist;
+        entry.maxIAD = maxInteratomicDist;
+        xtalopt->interComp[qMakePair<int, int>(atomicNum1, atomicNum2)] = entry;
+    }
+    this->updateCompositionTable();
+    this->updateMinIAD();
+    settings->endArray();
+    }
     // Formula Units List
     if (!filename.isEmpty()) {
       int size = settings->beginReadArray("Formula_Units");
@@ -478,9 +537,12 @@ namespace XtalOpt {
   {
     XtalOpt *xtalopt = qobject_cast<XtalOpt*>(m_opt);
 
+    QHash<QPair<int, int>, IAD> interComp;
     QHash<uint, XtalCompositionStruct> comp;
     QString symbol;
+    QString symbol2;
     unsigned int atomicNum;
+    unsigned int atomicNum2;
     unsigned int quantity;
     QStringList symbolList;
     QStringList quantityList;
@@ -560,22 +622,50 @@ namespace XtalOpt {
       }
 
       comp[atomicNum].quantity += quantity;
-    }
+  
+        for (uint j = 0; j < length; j++){
+            symbol2    = symbolList.at(j);
+            atomicNum2 = ElemInfo::getAtomicNum(
+                symbol2.trimmed().toStdString().c_str());
 
-    // If we changed the composition, reset the spacegroup generation
-    // min xtals per FU to be zero
-    if (xtalopt->comp != comp && xtalopt->minXtalsOfSpgPerFU.size() != 0) {
-      xtalopt->error(tr(
-               "Warning: because the composition have been changed, "
-               "the spacegroups to be generated using spacegroup "
-               "initialization have been reset. Please open the spacegroup "
-               "options to set them again."));
-      xtalopt->minXtalsOfSpgPerFU = QList<int>();
-    }
+            // Validate symbol
+            // if (!atomicNum1) continue; // Invalid symbol entered
+            // if (!atomicNum2) continue; // Invalid symbol entered
 
-    xtalopt->comp = comp;
-
-    this->updateMinRadii();
+            // Add twice to hash (if the two atoms are different)
+            if (!interComp.contains(qMakePair<int, int>(atomicNum, atomicNum2))) {
+                IAD entry;
+                entry.minIAD = ElemInfo::getCovalentRadius(atomicNum) + ElemInfo::getCovalentRadius(atomicNum2);
+                entry.maxIAD = entry.minIAD * 2.0;
+                interComp[qMakePair<int, int>(atomicNum, atomicNum2)] = entry;
+            }
+            if (atomicNum!=atomicNum2){
+                if (!interComp.contains(qMakePair<int, int>(atomicNum2, atomicNum))) {
+                    IAD entry;
+                    entry.minIAD = ElemInfo::getCovalentRadius(atomicNum) + ElemInfo::getCovalentRadius(atomicNum2);
+                    entry.maxIAD = entry.minIAD * 2.0;
+                    interComp[qMakePair<int, int>(atomicNum2, atomicNum)] = entry;
+                }
+            }        
+        }
+    } 
+    
+        // If we changed the composition, reset the spacegroup generation
+        // min xtals per FU to be zero
+        if (xtalopt->comp != comp && xtalopt->minXtalsOfSpgPerFU.size() != 0) {
+          xtalopt->error(tr(
+                   "Warning: because the composition have been changed, "
+                   "the spacegroups to be generated using spacegroup "
+                   "initialization have been reset. Please open the spacegroup "
+                   "options to set them again."));
+          xtalopt->minXtalsOfSpgPerFU = QList<int>();
+        }
+    
+        xtalopt->comp = comp;
+        xtalopt->interComp = interComp;
+    
+        this->updateMinRadii();
+        this->updateMinIAD();
     this->updateCompositionTable();
     this->updateNumDivisions();
   }
@@ -591,6 +681,11 @@ namespace XtalOpt {
     // Adjust table size:
     int numRows = keys.size();
     ui.table_comp->setRowCount(numRows);
+    int numRows2 = keys.size();
+         for(int j = numRows2-1; j > 0; j--){
+            numRows2=numRows2+j;
+        }
+    int z = 0;
 
     for (int i = 0; i < numRows; i++) {
       unsigned int atomicNum = keys.at(i);
@@ -621,6 +716,36 @@ namespace XtalOpt {
       ui.table_comp->setItem(i, CC_QUANTITY, quantityItem);
       ui.table_comp->setItem(i, CC_MASS, massItem);
       ui.table_comp->setItem(i, CC_MINRADIUS, minRadiusItem);
+
+    if (ui.cb_customIAD->isChecked()) {
+        ui.table_IAD->setRowCount(numRows2);
+
+        for (int k = i; k < numRows; k++) {
+            unsigned int atomicNum2 = keys.at(k);
+
+            QString symbol1 = ElemInfo::getAtomicSymbol(atomicNum).c_str();
+            QString symbol2 = ElemInfo::getAtomicSymbol(atomicNum2).c_str();
+
+            QTableWidgetItem *symbol1Item =
+                new QTableWidgetItem(symbol1);
+            QTableWidgetItem *symbol2Item =
+                new QTableWidgetItem(symbol2);
+
+            ui.table_IAD->setItem(z, IC_SYMBOL1, symbol1Item);
+            ui.table_IAD->setItem(z, IC_SYMBOL2, symbol2Item);
+
+            QString minIAD = QString::number(xtalopt->interComp[qMakePair<int, int>(atomicNum, atomicNum2)].minIAD, 'f', 3);
+            QString maxIAD = QString::number(xtalopt->interComp[qMakePair<int, int>(atomicNum, atomicNum2)].maxIAD, 'f', 3);
+            QTableWidgetItem *minIADItem =
+                new QTableWidgetItem(minIAD);
+            QTableWidgetItem *maxIADItem =
+                new QTableWidgetItem(maxIAD);
+            ui.table_IAD->setItem(z, IC_MINIAD, minIADItem);
+            ui.table_IAD->setItem(z, IC_MAXIAD, maxIADItem);
+
+            z++;
+        }
+      }
     }
   }
 
@@ -706,6 +831,19 @@ namespace XtalOpt {
       this->updateMinRadii();
       this->updateCompositionTable();
     }
+
+    if (xtalopt->using_customIAD != ui.cb_customIAD->isChecked()) {
+        xtalopt->using_customIAD = ui.cb_customIAD->isChecked();
+        this->updateMinIAD();
+        this->updateCompositionTable();
+    }
+    if (xtalopt->maxRadius != ui.spin_maxRadius->value()) {
+      xtalopt->maxRadius = ui.spin_maxRadius->value();
+    }
+    if (xtalopt->using_checkStepOpt != ui.cb_checkStepOpt->isChecked()) {
+        xtalopt->using_checkStepOpt = ui.cb_checkStepOpt->isChecked();
+    }
+
   }
 
   void TabInit::updateMinRadii()
@@ -721,6 +859,45 @@ namespace XtalOpt {
       if (it.value().minRadius < xtalopt->minRadius) {
         it.value().minRadius = xtalopt->minRadius;
       }
+    }
+  }
+
+  void TabInit::updateMinIAD()
+  {
+    XtalOpt *xtalopt = qobject_cast<XtalOpt*>(m_opt);
+
+    QHash<QPair<int, int>, IAD> interComp;
+
+    unsigned int length = ui.table_IAD->rowCount();
+
+
+    for (uint i = 0; i < length; i++){
+        QString symbol1 = ui.table_IAD->item(i, IC_SYMBOL1)->text();
+        int atomicNum1 = ElemInfo::getAtomicNum(symbol1.trimmed().toStdString().c_str());
+        QString symbol2 = ui.table_IAD->item(i, IC_SYMBOL2)->text();
+        int atomicNum2 = ElemInfo::getAtomicNum(symbol2.trimmed().toStdString().c_str());
+        QString strMinIAD = ui.table_IAD->item(i, IC_MINIAD)->text();
+        QString strMaxIAD = ui.table_IAD->item(i, IC_MAXIAD)->text();
+        double minIAD = ui.table_IAD->item(i, IC_MINIAD)->text().toDouble();
+        double maxIAD = ui.table_IAD->item(i, IC_MAXIAD)->text().toDouble();
+           QTableWidgetItem *minIADItem =
+                new QTableWidgetItem(QString::number(minIAD, 'f', 3));
+           QTableWidgetItem *maxIADItem =
+                new QTableWidgetItem(QString::number(maxIAD, 'f', 3));
+            ui.table_IAD->setItem(i, IC_MINIAD, minIADItem);
+            ui.table_IAD->setItem(i, IC_MAXIAD, maxIADItem);
+
+        interComp[qMakePair<int, int>(atomicNum1, atomicNum2)].minIAD = minIAD;
+        interComp[qMakePair<int, int>(atomicNum1, atomicNum2)].maxIAD = maxIAD;
+        xtalopt->interComp[qMakePair<int, int>(atomicNum1, atomicNum2)].minIAD = minIAD;
+        xtalopt->interComp[qMakePair<int, int>(atomicNum1, atomicNum2)].maxIAD = maxIAD;
+
+        if (atomicNum1!=atomicNum2){
+            xtalopt->interComp[qMakePair<int, int>(atomicNum2, atomicNum1)].minIAD = minIAD;
+            xtalopt->interComp[qMakePair<int, int>(atomicNum2, atomicNum1)].maxIAD = maxIAD;
+            interComp[qMakePair<int, int>(atomicNum2, atomicNum1)].minIAD = minIAD;
+            interComp[qMakePair<int, int>(atomicNum2, atomicNum1)].maxIAD = maxIAD;
+        }
     }
   }
 

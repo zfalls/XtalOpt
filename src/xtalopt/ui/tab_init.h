@@ -45,6 +45,14 @@ namespace XtalOpt {
 
     enum IADColumns
     {
+      IC_SYMBOL1 = 0,
+      IC_SYMBOL2 = 1,
+      IC_MINIAD = 2,
+      IC_MAXIAD = 3
+    };
+
+    enum MolUnitColumns
+    {
      IC_CENTER = 0,
      IC_NUMCENTERS = 1,
      IC_NEIGHBOR = 2,
@@ -85,6 +93,7 @@ namespace XtalOpt {
     void getGeom(QList<QString> & geomList, unsigned int numNeighbors);
     void setGeom(unsigned int & geom, QString strGeom);
     void openSpgOptions();
+    void updateMinIAD();
 
   signals:
 
